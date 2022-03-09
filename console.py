@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """ Console Module """
 import cmd
+import shlex
 import sys
 from models.base_model import BaseModel
 from models.__init__ import storage
@@ -115,16 +116,35 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, args):
         """ Create an object of any class"""
-        if not args:
+        #if not args:
+         #   print("** class name missing **")
+          #  return
+        #elif args not in HBNBCommand.classes:
+         #   print("** class doesn't exist **")
+          #  return
+        #new_instance = HBNBCommand.classes[args]()
+        #storage.save()
+        #print(new_instance.id)
+        #storage.save()
+        parsed_line = shlex.split(args)
+        if len(parsed_line) == 0:
             print("** class name missing **")
-            return
-        elif args not in HBNBCommand.classes:
+        elif parsed_line[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
-            return
-        new_instance = HBNBCommand.classes[args]()
-        storage.save()
-        print(new_instance.id)
-        storage.save()
+        else:
+            new_instance = HBNBCommand.classes[parsed_line[0]]()
+            if len(parsed_line) > 1:
+                for i in range(1, len(parsed_line)):
+                    k_v = parsed_line[i].split("=")
+                    if len(k_v) == 2:
+                        k_v[1] = k_v[1].replace("_", " ")
+                        try:
+                            setattr(new_instance, k_v[0], eval(k_v[1]))
+                        except (SyntaxError, NameError):
+                            setattr(new_instance, k_v[0], k_v[1])
+            storage.new(new_instance)
+            print(new_instance.id)
+            storage.save()
 
     def help_create(self):
         """ Help information for the create method """
@@ -197,23 +217,38 @@ class HBNBCommand(cmd.Cmd):
         print("Destroys an individual instance of a class")
         print("[Usage]: destroy <className> <objectId>\n")
 
-    def do_all(self, args):
+    def do_all(self, line):
         """ Shows all objects, or all objects of a class"""
-        print_list = []
+        #print_list = []
 
-        if args:
-            args = args.split(' ')[0]  # remove possible trailing args
-            if args not in HBNBCommand.classes:
-                print("** class doesn't exist **")
-                return
-            for k, v in storage._FileStorage__objects.items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
-        else:
-            for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
+        #if args:
+         #   args = args.split(' ')[0]  # remove possible trailing args
+          #  if args not in HBNBCommand.classes:
+           #     print("** class doesn't exist **")
+            #    return
+            #for k, v in storage.all(args).items():
+             #   if k.split('.')[0] == args:
+              #      print_list.append(str(v))
+        #else:
+         #   for k, v in storage.all(args).items():
+          #      print_list.append(str(v))
 
-        print(print_list)
+        #print(print_list)
+
+        if not line:
+            o = storage.all()
+            print([o[k].__str__() for k in o])
+            return
+        try:
+            args = line.split(" ")
+            if args[0] not in HBNBCommand.classes:
+                raise NameError()
+
+            o = storage.all(eval(args[0]))
+            print([o[k].__str__() for k in o])
+
+        except NameError:
+            print("** class doesn't exist **")
 
     def help_all(self):
         """ Help information for the all command """
