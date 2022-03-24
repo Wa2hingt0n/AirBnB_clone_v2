@@ -7,6 +7,7 @@ from fabric.api import *
 env.hosts = ["34.204.166.82", "44.200.178.195"]
 env.user = "ubuntu"
 
+
 def do_deploy(archive_path):
     """ Deploys an archive file to a remote host
 
@@ -36,5 +37,5 @@ def do_deploy(archive_path):
 
         return True
 
-    except:
+    except ValueError:
         return False
