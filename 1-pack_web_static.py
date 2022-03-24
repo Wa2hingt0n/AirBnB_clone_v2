@@ -5,6 +5,9 @@ from fabric.api import *
 from datetime import datetime
 
 
+env.hosts = ["34.204.166.82", "44.200.178.195"]
+env.user = "ubuntu"
+
 def do_pack():
     """Generates a '.tgz' archive from the contents of the web_static folder"""
     dt = datetime.now()
@@ -20,3 +23,7 @@ def do_pack():
         return None
 
     return path
+
+def copy_to_host():
+    """ Copies files to the remote web servers """
+    put("0-setup_web_static.sh", "/home/ubuntu")
