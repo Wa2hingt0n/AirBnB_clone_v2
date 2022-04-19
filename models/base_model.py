@@ -24,6 +24,7 @@ class BaseModel:
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
         else:
+            self.created_at = self.updated_at = datetime.now()
             for key, value in kwargs.items():
                 if key == "created_at" or key == "updated_at":
                     value = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
@@ -32,8 +33,11 @@ class BaseModel:
 
     def __str__(self):
         """Returns a string representation of the instance"""
-        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
-        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
+        #cls = (str(type(self)).split('.')[-1]).split('\'')[0]
+        #return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
+        d = self.__dict__.copy()
+        d.pop("_sa_instance_state", None)
+        return "[{}] ({}) {}".format(type(self).__name__, self.id, d)
 
     def save(self):
         """Updates updated_at with current time when instance is changed"""
