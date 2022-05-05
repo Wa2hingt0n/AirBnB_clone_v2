@@ -14,6 +14,12 @@ class FileStorage:
         Args:
             cls: Class of the list of objects to return
         """
+        if cls is not None:
+            my_dict = {}
+            for key, val in FileStorage.__objects.items():
+                if cls.__name__ == key.split('.')[0]:
+                    my_dict[key] = val
+            return my_dict
         return FileStorage.__objects
 
     def new(self, obj):
@@ -51,6 +57,7 @@ class FileStorage:
                 for key, val in temp.items():
                     self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
+            print("Not found")
             pass
 
     def delete(self, obj=None):
